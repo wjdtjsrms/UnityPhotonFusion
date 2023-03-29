@@ -6,6 +6,7 @@ namespace JSGCode.Internship.UI
     using UnityEngine;
     using UnityEngine.UI;
     using TMPro;
+    using JSGCode.Internship.Chat;
 
     public class UIPanelInputMessage : UIPanel
     {
@@ -18,6 +19,11 @@ namespace JSGCode.Internship.UI
         public override void Init()
         {
             base.Init();
+
+            sendMessageBtn.onClick.AddListener(() => 
+            {
+                ChatProvider.Instance.OnEnterSend();
+            });
         }
         #endregion
     }

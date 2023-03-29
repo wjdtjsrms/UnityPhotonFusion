@@ -12,6 +12,7 @@ namespace JSGCode.Internship.Chat
     using UnityEngine.Analytics;
     using UnityEngine.UI;
     using WebSocketSharp;
+    using TMPro;
 
     public class ChatProvider : SingletonMonoBehaviour<ChatProvider>, IChatClientListener
     {
@@ -27,7 +28,7 @@ namespace JSGCode.Internship.Chat
         private string selectedChannelName; // mainly used for GUI/input
 
         public ChatClient chatClient;
-
+        
 #if !PHOTON_UNITY_NETWORKING
         public ChatAppSettings ChatAppSettings
         {
@@ -44,7 +45,7 @@ namespace JSGCode.Internship.Chat
 
         public RectTransform ChatPanel;     // set in inspector (to enable/disable panel)
         public GameObject UserIdFormPanel;
-        public InputField InputFieldChat;   // set in inspector
+        public TMP_InputField InputFieldChat;   // set in inspector
         public Text CurrentChannelText;     // set in inspector
         public Toggle ChannelToggleToInstantiate; // set in inspector
 
@@ -60,6 +61,8 @@ namespace JSGCode.Internship.Chat
         public Text StateText; // set in inspector
         public Text UserIdText; // set in inspector
         #endregion
+
+
 
         public void Start()
         {
@@ -148,11 +151,13 @@ namespace JSGCode.Internship.Chat
 
         public void OnEnterSend()
         {
-            if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
-            {
-                this.SendChatMessage(this.InputFieldChat.text);
-                this.InputFieldChat.text = "";
-            }
+            //if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
+            //{
+              
+            //}
+
+            this.SendChatMessage(this.InputFieldChat.text);
+            this.InputFieldChat.text = "";
         }
 
         public void OnClickSend()
@@ -553,24 +558,6 @@ namespace JSGCode.Internship.Chat
             Debug.LogFormat("OnErrorInfo for channel {0}. Error: {1} Data: {2}", channel, error, data);
         }
 
-        public void AddMessageToSelectedChannel(string msg)
-        {
-            ChatChannel channel = null;
-            bool found = this.chatClient.TryGetChannel(this.selectedChannelName, out channel);
-            if (!found)
-            {
-                Debug.Log("AddMessageToSelectedChannel failed to find channel: " + this.selectedChannelName);
-                return;
-            }
-
-            if (channel != null)
-            {
-                channel.Add("Bot", msg, 0); //TODO: how to use msgID?
-            }
-        }
-
-
-
         public void ShowChannel(string channelName)
         {
             if (string.IsNullOrEmpty(channelName))
@@ -594,11 +581,6 @@ namespace JSGCode.Internship.Chat
             {
                 pair.Value.isOn = pair.Key == channelName ? true : false;
             }
-        }
-
-        public void OpenDashboard()
-        {
-            Application.OpenURL("https://dashboard.photonengine.com");
         }
     }
 }
