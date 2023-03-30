@@ -66,7 +66,7 @@ namespace JSGCode.Internship.Chat
         #endregion
 
         #region Method
-        public void Connect(string roomName, string userName = null)
+        public void Connect(string roomName, string userName)
         {
             if (currentRoomName != null)
             {
