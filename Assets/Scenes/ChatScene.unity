@@ -762,28 +762,12 @@ MonoBehaviour:
   - Guild
   FriendsList: []
   HistoryLengthToFetch: 0
-  chatAppSettings:
-    AppIdChat: 870598ae-744a-4d8d-8728-5b8471e1f9f8
-    AppVersion: 
-    FixedRegion: 
-    Server: 
-    Port: 0
-    ProxyServer: 
-    Protocol: 0
-    EnableProtocolFallback: 1
-    NetworkLogging: 1
-  missingAppIdErrorPanel: {fileID: 908731029}
-  ConnectingLabel: {fileID: 1843814179}
-  ChatPanel: {fileID: 135306266}
-  UserIdFormPanel: {fileID: 328803042}
-  InputFieldChat: {fileID: 11986584}
-  CurrentChannelText: {fileID: 3260397}
+  InputFieldChat: {fileID: 0}
+  CurrentChannelText: {fileID: 1445797021}
   ChannelToggleToInstantiate: {fileID: 0}
   FriendListUiItemtoInstantiate: {fileID: 1610767248}
   ShowState: 1
-  Title: {fileID: 1432980811}
-  StateText: {fileID: 33885521}
-  UserIdText: {fileID: 1445797021}
+  chatState: 0
   TestLength: 2048
 --- !u!4 &179399720
 Transform:

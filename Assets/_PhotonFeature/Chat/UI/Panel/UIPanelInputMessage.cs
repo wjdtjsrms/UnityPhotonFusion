@@ -7,6 +7,7 @@ namespace JSGCode.Internship.UI
     using UnityEngine.UI;
     using TMPro;
     using JSGCode.Internship.Chat;
+    using WebSocketSharp;
 
     public class UIPanelInputMessage : UIPanel
     {
@@ -22,7 +23,8 @@ namespace JSGCode.Internship.UI
 
             sendMessageBtn.onClick.AddListener(() => 
             {
-                ChatProvider.Instance.OnEnterSend();
+                ChatProvider.Instance.OnEnterSend(inputField.text);
+                inputField.text = "";
             });
         }
         #endregion

@@ -3,7 +3,6 @@ namespace JSGCode.Internship.Chat
     using JSGCode.Util;
     using Photon.Chat;
     using Photon.Chat.Demo;
-    using Photon.Realtime;
     using System;
     using System.Collections.Generic;
     using TMPro;
@@ -23,24 +22,10 @@ namespace JSGCode.Internship.Chat
 
         private string selectedChannelName; // mainly used for GUI/input
 
-        public ChatClient chatClient;
+        private ChatClient chatClient;
 
-#if !PHOTON_UNITY_NETWORKING
-        public ChatAppSettings ChatAppSettings
-        {
-            get { return this.chatAppSettings; }
-        }
+        private ChatAppSettings chatAppSettings = new ChatAppSettings();
 
-        [SerializeField]
-#endif
-        protected internal ChatAppSettings chatAppSettings;
-
-
-        public GameObject missingAppIdErrorPanel;
-        public GameObject ConnectingLabel;
-
-        public RectTransform ChatPanel;     // set in inspector (to enable/disable panel)
-        public GameObject UserIdFormPanel;
         public TMP_InputField InputFieldChat;   // set in inspector
         public Text CurrentChannelText;     // set in inspector
         public Toggle ChannelToggleToInstantiate; // set in inspector
@@ -53,9 +38,7 @@ namespace JSGCode.Internship.Chat
         private readonly Dictionary<string, FriendItem> friendListItemLUT = new Dictionary<string, FriendItem>();
 
         public bool ShowState = true;
-        public GameObject Title;
-        public Text StateText; // set in inspector
-        public Text UserIdText; // set in inspector
+        [SerializeField] private ChatState chatState;
 
         public int TestLength = 2048;
         private byte[] testBytes = new byte[2048];
@@ -64,110 +47,50 @@ namespace JSGCode.Internship.Chat
         #region Method : Mono
         public void Start()
         {
-            DontDestroyOnLoad(this.gameObject);
+            chatState = ChatState.Uninitialized;
+            chatAppSettings.AppIdChat = "870598ae-744a-4d8d-8728-5b8471e1f9f8";
 
-            this.UserIdText.text = "";
-            this.StateText.text = "";
-            this.StateText.gameObject.SetActive(true);
-            this.UserIdText.gameObject.SetActive(true);
-            this.Title.SetActive(true);
-            this.ChatPanel.gameObject.SetActive(false);
-            this.ConnectingLabel.SetActive(false);
-
-            if (string.IsNullOrEmpty(this.UserName))
+            if (string.IsNullOrEmpty(UserName))
             {
-                this.UserName = "user" + Environment.TickCount % 99; //made-up username
-            }
-
-#if PHOTON_UNITY_NETWORKING
-            this.chatAppSettings = PhotonNetwork.PhotonServerSettings.AppSettings.GetChatSettings();
-#endif
-
-            bool appIdPresent = !string.IsNullOrEmpty(this.chatAppSettings.AppIdChat);
-
-            this.missingAppIdErrorPanel.SetActive(!appIdPresent);
-            this.UserIdFormPanel.gameObject.SetActive(appIdPresent);
-
-            if (!appIdPresent)
-            {
-                Debug.LogError("You need to set the chat app ID in the PhotonServerSettings file in order to continue.");
+                UserName = "user" + Environment.TickCount % 99; //made-up username
             }
         }
 
-        /// <summary>To avoid that the Editor becomes unresponsive, disconnect all Photon connections in OnDestroy.</summary>
         public void OnDestroy()
         {
-            if (this.chatClient != null)
-            {
-                this.chatClient.Disconnect();
-            }
+            if (chatClient != null)
+                chatClient.Disconnect();
         }
 
-        /// <summary>To avoid that the Editor becomes unresponsive, disconnect all Photon connections in OnApplicationQuit.</summary>
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
 
-            if (this.chatClient != null)
-            {
-                this.chatClient.Disconnect();
-            }
+            if (chatClient != null)
+                chatClient.Disconnect();
         }
 
         public void Update()
         {
-            if (this.chatClient != null)
-            {
-                this.chatClient.Service(); // make sure to call this regularly! it limits effort internally, so calling often is ok!
-            }
-
-            // check if we are missing context, which means we got kicked out to get back to the Photon Demo hub.
-            if (this.StateText == null)
-            {
-                Destroy(this.gameObject);
-                return;
-            }
-
-            this.StateText.gameObject.SetActive(this.ShowState); // this could be handled more elegantly, but for the demo it's ok.
+            if (chatClient != null)
+                chatClient.Service();
         }
         #endregion
 
         #region Method
         public void Connect()
         {
-            this.UserIdFormPanel.gameObject.SetActive(false);
-
-            this.chatClient = new ChatClient(this);
+            chatClient ??= new ChatClient(this);
 #if !UNITY_WEBGL
-            this.chatClient.UseBackgroundWorkerForSending = true;
+            chatClient.UseBackgroundWorkerForSending = true;
 #endif
-            this.chatClient.AuthValues = new Photon.Chat.AuthenticationValues(this.UserName);
-            this.chatClient.ConnectUsingSettings(this.chatAppSettings);
-
-            //this.ChannelToggleToInstantiate.gameObject.SetActive(false);
-            Debug.Log("Connecting as: " + this.UserName);
-
-            this.ConnectingLabel.SetActive(true);
+            chatClient.AuthValues = new AuthenticationValues(UserName);
+            chatClient.ConnectUsingSettings(this.chatAppSettings);
         }
 
-        public void OnEnterSend()
+        public void OnEnterSend(string message)
         {
-            //if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
-            //{
-
-            //}
-
-            this.SendChatMessage(this.InputFieldChat.text);
-            this.InputFieldChat.text = "";
-        }
-
-        public void OnClickSend()
-        {
-            if (this.InputFieldChat != null)
-            {
-                this.SendChatMessage(this.InputFieldChat.text);
-                this.InputFieldChat.text = "";
-            }
+            SendChatMessage(message);
         }
 
         private void SendChatMessage(string inputLine)
@@ -199,106 +122,13 @@ namespace JSGCode.Internship.Chat
             }
             //UnityEngine.Debug.Log("selectedChannelName: " + selectedChannelName + " doingPrivateChat: " + doingPrivateChat + " privateChatTarget: " + privateChatTarget);
 
-
-            if (inputLine[0].Equals('\\'))
+            if (doingPrivateChat)
             {
-                string[] tokens = inputLine.Split(new char[] { ' ' }, 2);
-                if (tokens[0].Equals("\\help"))
-                {
-                    this.PostHelpToCurrentChannel();
-                }
-                if (tokens[0].Equals("\\state"))
-                {
-                    int newState = 0;
-
-
-                    List<string> messages = new List<string>();
-                    messages.Add("i am state " + newState);
-                    string[] subtokens = tokens[1].Split(new char[] { ' ', ',' });
-
-                    if (subtokens.Length > 0)
-                    {
-                        newState = int.Parse(subtokens[0]);
-                    }
-
-                    if (subtokens.Length > 1)
-                    {
-                        messages.Add(subtokens[1]);
-                    }
-
-                    this.chatClient.SetOnlineStatus(newState, messages.ToArray()); // this is how you set your own state and (any) message
-                }
-                else if ((tokens[0].Equals("\\subscribe") || tokens[0].Equals("\\s")) && !string.IsNullOrEmpty(tokens[1]))
-                {
-                    this.chatClient.Subscribe(tokens[1].Split(new char[] { ' ', ',' }));
-                }
-                else if ((tokens[0].Equals("\\unsubscribe") || tokens[0].Equals("\\u")) && !string.IsNullOrEmpty(tokens[1]))
-                {
-                    this.chatClient.Unsubscribe(tokens[1].Split(new char[] { ' ', ',' }));
-                }
-                else if (tokens[0].Equals("\\clear"))
-                {
-                    if (doingPrivateChat)
-                    {
-                        this.chatClient.PrivateChannels.Remove(this.selectedChannelName);
-                    }
-                    else
-                    {
-                        ChatChannel channel;
-                        if (this.chatClient.TryGetChannel(this.selectedChannelName, doingPrivateChat, out channel))
-                        {
-                            channel.ClearMessages();
-                        }
-                    }
-                }
-                else if (tokens[0].Equals("\\msg") && !string.IsNullOrEmpty(tokens[1]))
-                {
-                    string[] subtokens = tokens[1].Split(new char[] { ' ', ',' }, 2);
-                    if (subtokens.Length < 2) return;
-
-                    string targetUser = subtokens[0];
-                    string message = subtokens[1];
-                    this.chatClient.SendPrivateMessage(targetUser, message);
-                }
-                else if ((tokens[0].Equals("\\join") || tokens[0].Equals("\\j")) && !string.IsNullOrEmpty(tokens[1]))
-                {
-                    string[] subtokens = tokens[1].Split(new char[] { ' ', ',' }, 2);
-
-                    // If we are already subscribed to the channel we directly switch to it, otherwise we subscribe to it first and then switch to it implicitly
-                    if (this.channelToggles.ContainsKey(subtokens[0]))
-                    {
-                        this.ShowChannel(subtokens[0]);
-                    }
-                    else
-                    {
-                        this.chatClient.Subscribe(new string[] { subtokens[0] });
-                    }
-                }
-#if CHAT_EXTENDED
-                else if ((tokens[0].Equals("\\nickname") || tokens[0].Equals("\\nick") ||tokens[0].Equals("\\n")) && !string.IsNullOrEmpty(tokens[1]))
-                {
-                    if (!doingPrivateChat)
-                    {
-                        this.chatClient.SetCustomUserProperties(this.selectedChannelName, this.chatClient.UserId, new Dictionary<string, object> {{"Nickname", tokens[1]}});
-                    }
-
-                }
-#endif
-                else
-                {
-                    Debug.Log("The command '" + tokens[0] + "' is invalid.");
-                }
+                chatClient.SendPrivateMessage(privateChatTarget, inputLine);
             }
             else
             {
-                if (doingPrivateChat)
-                {
-                    this.chatClient.SendPrivateMessage(privateChatTarget, inputLine);
-                }
-                else
-                {
-                    this.chatClient.PublishMessage(this.selectedChannelName, inputLine);
-                }
+                chatClient.PublishMessage(selectedChannelName, inputLine);
             }
         }
 
@@ -383,7 +213,7 @@ namespace JSGCode.Internship.Chat
         public void OnDisconnected()
         {
             Debug.Log("OnDisconnected()");
-            this.ConnectingLabel.SetActive(false);
+
         }
 
         public void OnConnected()
@@ -392,12 +222,6 @@ namespace JSGCode.Internship.Chat
             {
                 this.chatClient.Subscribe(this.ChannelsToJoinOnConnect, this.HistoryLengthToFetch);
             }
-
-            this.ConnectingLabel.SetActive(false);
-
-            this.UserIdText.text = "Connected as " + this.UserName;
-
-            this.ChatPanel.gameObject.SetActive(true);
 
             if (this.FriendsList != null && this.FriendsList.Length > 0)
             {
@@ -428,8 +252,7 @@ namespace JSGCode.Internship.Chat
         {
             // use OnConnected() and OnDisconnected()
             // this method might become more useful in the future, when more complex states are being used.
-
-            this.StateText.text = state.ToString();
+            chatState = state;
         }
 
         public void OnGetMessages(string channelName, string[] senders, object[] messages)
