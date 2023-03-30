@@ -2050,8 +2050,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51d807feeba39954b8f650573ddd5767, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputField: {fileID: 0}
-  startChatBtn: {fileID: 0}
+  enterA_Btn: {fileID: 1905105932}
+  enterB_Btn: {fileID: 498330164}
+  exitBtn: {fileID: 2057003746}
 --- !u!1 &1524083172
 GameObject:
   m_ObjectHideFlags: 0

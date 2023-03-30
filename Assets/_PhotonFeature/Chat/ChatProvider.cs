@@ -46,9 +46,9 @@ namespace JSGCode.Internship.Chat
 
         public GameObject FriendListUiItemtoInstantiate;
 
-        private readonly Dictionary<string, Toggle> channelToggles = new Dictionary<string, Toggle>();
+        private readonly Dictionary<string, Toggle> channelToggles = new();
 
-        private readonly Dictionary<string, FriendItem> friendListItemLUT = new Dictionary<string, FriendItem>();
+        private readonly Dictionary<string, FriendItem> friendListItemLUT = new();
 
         public bool ShowState = true;
         [SerializeField] private ChatState chatState;
@@ -70,22 +70,18 @@ namespace JSGCode.Internship.Chat
 
         public void OnDestroy()
         {
-            if (chatClient != null)
-                chatClient.Disconnect();
+            chatClient?.Disconnect();
         }
 
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
-
-            if (chatClient != null)
-                chatClient.Disconnect();
+            chatClient?.Disconnect();
         }
 
         public void Update()
         {
-            if (chatClient != null)
-                chatClient.Service();
+            chatClient?.Service();
         }
         #endregion
 

@@ -8,14 +8,15 @@ using JSGCode.Internship.Chat;
 public class UIPageTest : MonoBehaviour
 {
     #region Member
-    [SerializeField] private TMP_InputField inputField;
-    [SerializeField] private Button startChatBtn;
+    [SerializeField] private Button enterA_Btn;
+    [SerializeField] private Button enterB_Btn;
+    [SerializeField] private Button exitBtn;
     #endregion
 
     #region Method : Mono
     private void Awake()
     {
-        startChatBtn.onClick.AddListener(() => ChatProvider.Instance.Connect());
+      
     }
     #endregion
 }
