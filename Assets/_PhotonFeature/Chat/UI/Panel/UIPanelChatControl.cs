@@ -34,7 +34,7 @@ namespace JSGCode.Internship.UI
         public void AddChanel(string chanelName)
         {
             if (itemList.Find((item) => item.Data.serverName.Equals(chanelName)) == null)
-                AddItem(new ChatServerModel(chanelName, chanelName));
+                AddItem(new ChatServerModel(chanelName, chanelName.Split(":")[1]));
         }
 
         public void RemoveChanel(string chanelName)

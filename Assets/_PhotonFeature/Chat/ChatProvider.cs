@@ -354,15 +354,16 @@ namespace JSGCode.Internship.Chat
 
         public void OnUserSubscribed(string channel, string user)
         {
-            Debug.LogFormat("OnUserSubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
             onUserSubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(user));
-            chatClient.SendPrivateMessage(user, "Hello", true);
+            chatClient.SendPrivateMessage(user, "Subscribed User", true);
         }
 
         public void OnUserUnsubscribed(string channel, string user)
         {
             onUserUnsubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(user));
-            Debug.LogFormat("OnUserUnsubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
+
+            if (selectedChannelName.Contains(user))
+                ShowChannel("World");
         }
         #endregion
     }
