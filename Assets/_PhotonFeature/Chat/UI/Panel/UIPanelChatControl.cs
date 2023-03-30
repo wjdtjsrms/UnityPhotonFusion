@@ -19,25 +19,34 @@ namespace JSGCode.Internship.UI
             base.Init();
             ChatProvider.Instance.onUserSubscribed += AddChanel;
             ChatProvider.Instance.onUserUnsubscribed += RemoveChanel;
+            ChatProvider.Instance.onDisconnect += RemoveAll;
 
-            selectWorldChatBtn.onClick.AddListener(() => ChatProvider.Instance.ShowChannel("World"));
+            selectWorldChatBtn.onClick.AddListener(ChatProvider.Instance.ShowRoomChanel);
         }
 
         public override void Release()
         {
             base.Release();
+
+            if (ChatProvider.Instance != null)
+            {
+                ChatProvider.Instance.onUserSubscribed -= AddChanel;
+                ChatProvider.Instance.onUserUnsubscribed -= RemoveChanel;
+                ChatProvider.Instance.onDisconnect -= RemoveAll;
+            }
+
             selectWorldChatBtn.onClick.RemoveAllListeners();
         }
         #endregion
 
         #region Method : Member
-        public void AddChanel(string chanelName)
+        private void AddChanel(string chanelName)
         {
             if (itemList.Find((item) => item.Data.serverName.Equals(chanelName)) == null)
                 AddItem(new ChatServerModel(chanelName, chanelName.Split(":")[1]));
         }
 
-        public void RemoveChanel(string chanelName)
+        private void RemoveChanel(string chanelName)
         {
             foreach (var item in itemList.ToArray())
             {

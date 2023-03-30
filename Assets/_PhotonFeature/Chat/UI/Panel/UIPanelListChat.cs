@@ -11,13 +11,19 @@ namespace JSGCode.Internship.UI
         public override void Init()
         {
             base.Init();
+
             ChatProvider.Instance.onChangeChannelText += SetChanelText;
+            ChatProvider.Instance.onDisconnect += RemoveAll;
         }
         public override void Release()
         {
             base.Release();
+
             if (ChatProvider.Instance != null)
+            {
                 ChatProvider.Instance.onChangeChannelText -= SetChanelText;
+                ChatProvider.Instance.onDisconnect -= RemoveAll;
+            }
         }
         #endregion
 

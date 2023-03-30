@@ -5,6 +5,7 @@ namespace JSGCode.Internship.Chat
     using System;
     using System.Collections.Generic;
     using UnityEngine;
+    using WebSocketSharp;
 
     public class ChatProvider : SingletonMonoBehaviour<ChatProvider>, IChatClientListener
     {
@@ -36,6 +37,7 @@ namespace JSGCode.Internship.Chat
         public Action<List<string>> onChangeChannelText;
         public Action<string> onUserSubscribed;
         public Action<string> onUserUnsubscribed;
+        public Action onDisconnect;
         #endregion
 
         #region Method : Mono
@@ -112,6 +114,12 @@ namespace JSGCode.Internship.Chat
                 chatClient.PublishMessage(currentChannelName, inputLine);
         }
 
+        public void ShowRoomChanel()
+        {
+            if (currentRoomName.IsNullOrEmpty() == false)
+                ShowChannel(currentRoomName);
+        }
+
         public void ShowChannel(string channelName)
         {
             if (string.IsNullOrEmpty(channelName))
@@ -130,23 +138,6 @@ namespace JSGCode.Internship.Chat
         #endregion
 
         #region IChatClientListener implementation
-
-        public void DebugReturn(ExitGames.Client.Photon.DebugLevel level, string message)
-        {
-            if (level == ExitGames.Client.Photon.DebugLevel.ERROR)
-            {
-                LogWrapper.LogError(message);
-            }
-            else if (level == ExitGames.Client.Photon.DebugLevel.WARNING)
-            {
-                LogWrapper.LogWarning(message);
-            }
-            else
-            {
-                LogWrapper.Log(message);
-            }
-        }
-
         public void OnConnected()
         {
             chatClient.Subscribe(currentRoomName, 0, historyLengthToFetch, creationOptions: new ChannelCreationOptions { PublishSubscribers = true });
@@ -155,7 +146,7 @@ namespace JSGCode.Internship.Chat
 
         public void OnDisconnected()
         {
-            Debug.Log("OnDisconnected()");
+            onDisconnect?.Invoke();
         }
 
         public void OnGetMessages(string channelName, string[] senders, object[] messages)
@@ -170,17 +161,13 @@ namespace JSGCode.Internship.Chat
                 onUserSubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(sender));
 
             if (currentChannelName.Equals(channelName))
-            {
                 ShowChannel(channelName);
-            }
         }
 
         public void OnSubscribed(string[] channels, bool[] results)
         {
             foreach (string channel in channels)
-            {
                 chatClient.PublishMessage(channel, "says 'hi'.");
-            }
 
             ShowChannel(channels[0]);
         }
@@ -206,6 +193,22 @@ namespace JSGCode.Internship.Chat
 
             if (currentChannelName.Contains(user))
                 ShowChannel(currentRoomName);
+        }
+
+        public void DebugReturn(ExitGames.Client.Photon.DebugLevel level, string message)
+        {
+            if (level == ExitGames.Client.Photon.DebugLevel.ERROR)
+            {
+                LogWrapper.LogError(message);
+            }
+            else if (level == ExitGames.Client.Photon.DebugLevel.WARNING)
+            {
+                LogWrapper.LogWarning(message);
+            }
+            else
+            {
+                LogWrapper.Log(message);
+            }
         }
 
         public void OnStatusUpdate(string user, int status, bool gotMessage, object message) { }
