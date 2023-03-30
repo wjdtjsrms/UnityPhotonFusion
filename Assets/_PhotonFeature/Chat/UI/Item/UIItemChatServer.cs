@@ -1,5 +1,6 @@
 namespace JSGCode.Internship.UI
 {
+    using JSGCode.Internship.Chat;
     using JSGCode.Internship.DataModel;
     using JSGCode.UI;
     using TMPro;
@@ -14,10 +15,20 @@ namespace JSGCode.Internship.UI
         #endregion
 
         #region Method : UI
+
+        public override void Release()
+        {
+            base.Release();
+            selectServerBtn.onClick.RemoveAllListeners();
+        }
+
         public override void SetItem(ChatServerModel data)
         {
             base.SetItem(data);
             userID.text = data.userID;
+
+            selectServerBtn.onClick.RemoveAllListeners();
+            selectServerBtn.onClick.AddListener(() => ChatProvider.Instance.ShowChannel(data.serverName));
         }
         #endregion
     }

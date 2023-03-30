@@ -5,7 +5,6 @@ namespace JSGCode.Internship.Chat
     using Photon.Chat.Demo;
     using System;
     using System.Collections.Generic;
-    using TMPro;
     using UnityEngine;
     using UnityEngine.UI;
 
@@ -16,20 +15,18 @@ namespace JSGCode.Internship.Chat
 
         public string[] FriendsList;
 
-        public int HistoryLengthToFetch; // set in inspector. Up to a certain degree, previously sent messages can be fetched for context
+        private int historyLengthToFetch = -1; // Get All Histroy
 
         public string userName { get; private set; }
 
-        private string selectedChannelName; // mainly used for GUI/input
+        private string selectedChannelName;
 
         private ChatClient chatClient;
 
         private ChatAppSettings chatAppSettings;
 
-        public TMP_InputField InputFieldChat;   // set in inspector
-
         public List<string> currentChannelText = new();
-        public List<string> CurrentChannelText 
+        public List<string> CurrentChannelText
         {
             get
             {
@@ -44,6 +41,8 @@ namespace JSGCode.Internship.Chat
         public Toggle ChannelToggleToInstantiate; // set in inspector
 
         public Action<List<string>> onChangeChannelText;
+        public Action<string> onUserSubscribed;
+        public Action<string> onUserUnsubscribed;
 
         public GameObject FriendListUiItemtoInstantiate;
 
@@ -157,13 +156,12 @@ namespace JSGCode.Internship.Chat
                 Debug.Log("Skipping creation for an existing channel toggle.");
                 return;
             }
+            //Toggle cbtn = Instantiate(this.ChannelToggleToInstantiate);
+            //cbtn.gameObject.SetActive(true);
+            //cbtn.GetComponentInChildren<ChannelSelector>().SetChannel(channelName);
+            //cbtn.transform.SetParent(this.ChannelToggleToInstantiate.transform.parent, false);
 
-            Toggle cbtn = Instantiate(this.ChannelToggleToInstantiate);
-            cbtn.gameObject.SetActive(true);
-            cbtn.GetComponentInChildren<ChannelSelector>().SetChannel(channelName);
-            cbtn.transform.SetParent(this.ChannelToggleToInstantiate.transform.parent, false);
-
-            this.channelToggles.Add(channelName, cbtn);
+            //this.channelToggles.Add(channelName, cbtn);
         }
 
         private void InstantiateFriendButton(string friendId)
@@ -233,7 +231,7 @@ namespace JSGCode.Internship.Chat
         {
             if (this.ChannelsToJoinOnConnect != null && this.ChannelsToJoinOnConnect.Length > 0)
             {
-                this.chatClient.Subscribe(this.ChannelsToJoinOnConnect, this.HistoryLengthToFetch);
+                this.chatClient.Subscribe("World", 0, this.historyLengthToFetch, creationOptions: new ChannelCreationOptions { PublishSubscribers = true });
             }
 
             if (this.FriendsList != null && this.FriendsList.Length > 0)
@@ -345,17 +343,8 @@ namespace JSGCode.Internship.Chat
             }
         }
 
-        /// <summary>
-        /// New status of another user (you get updates for users set in your friends list).
-        /// </summary>
-        /// <param name="user">Name of the user.</param>
-        /// <param name="status">New status of that user.</param>
-        /// <param name="gotMessage">True if the status contains a message you should cache locally. False: This status update does not include a
-        /// message (keep any you have).</param>
-        /// <param name="message">Message that user set.</param>
         public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
         {
-
             Debug.LogWarning("status: " + string.Format("{0} is {1}. Msg:{2}", user, status, message));
 
             if (this.friendListItemLUT.ContainsKey(user))
@@ -368,10 +357,13 @@ namespace JSGCode.Internship.Chat
         public void OnUserSubscribed(string channel, string user)
         {
             Debug.LogFormat("OnUserSubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
+            onUserSubscribed?.Invoke(user);
+            chatClient.SendPrivateMessage(user, "2 x 3 x 7");
         }
 
         public void OnUserUnsubscribed(string channel, string user)
         {
+            onUserUnsubscribed?.Invoke(user);
             Debug.LogFormat("OnUserUnsubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
         }
         #endregion

@@ -407,11 +407,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChannelsToJoinOnConnect:
+  - World
   - Region
-  - Guild
   FriendsList: []
-  HistoryLengthToFetch: 0
-  InputFieldChat: {fileID: 0}
   currentChannelText: []
   ChannelToggleToInstantiate: {fileID: 0}
   FriendListUiItemtoInstantiate: {fileID: 0}

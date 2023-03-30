@@ -1,13 +1,10 @@
 namespace JSGCode.Internship.UI
 {
+    using JSGCode.Internship.Chat;
     using JSGCode.UI;
-    using System.Collections;
-    using System.Collections.Generic;
+    using TMPro;
     using UnityEngine;
     using UnityEngine.UI;
-    using TMPro;
-    using JSGCode.Internship.Chat;
-    using WebSocketSharp;
 
     public class UIPanelInputMessage : UIPanel
     {
@@ -21,7 +18,7 @@ namespace JSGCode.Internship.UI
         {
             base.Init();
 
-            sendMessageBtn.onClick.AddListener(() => 
+            sendMessageBtn.onClick.AddListener(() =>
             {
                 ChatProvider.Instance.OnEnterSend(inputField.text);
                 inputField.text = "";

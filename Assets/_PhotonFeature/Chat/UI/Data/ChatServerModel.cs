@@ -4,5 +4,16 @@ namespace JSGCode.Internship.DataModel
     {
         public string serverName;
         public string userID;
+
+        public ChatServerModel()
+        {
+
+        }
+
+        public ChatServerModel(string serverName, string userID)
+        {
+            this.serverName = serverName;
+            this.userID = userID;
+        }
     }
 }
