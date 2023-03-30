@@ -15,7 +15,7 @@ namespace JSGCode.Internship.Chat
         private ChatAppSettings chatAppSettings;
         private List<string> currentChannelText;
 
-        private readonly string currentRoomName = "World";
+        private string currentRoomName = null;
         #endregion
 
         #region Property
@@ -44,8 +44,6 @@ namespace JSGCode.Internship.Chat
             chatAppSettings ??= new ChatAppSettings();
             currentChannelText ??= new();
             chatAppSettings.AppIdChat = "870598ae-744a-4d8d-8728-5b8471e1f9f8";
-
-            Connect();
         }
 
         public void OnDestroy()
@@ -66,19 +64,32 @@ namespace JSGCode.Internship.Chat
         #endregion
 
         #region Method
-        public void Connect(string userName = null)
+        public void Connect(string roomName, string userName = null)
         {
+            if (currentRoomName != null)
+            {
+                LogWrapper.LogWarning("Already Connect Chat Server");
+                return;
+            }
+
             if (string.IsNullOrEmpty(userName))
                 userName = "user" + Environment.TickCount % 99; //made-up username
 
-            this.UserName = userName;
+            UserName = userName;
+            currentRoomName = roomName;
 
             chatClient ??= new ChatClient(this);
 #if !UNITY_WEBGL
-            chatClient.UseBackgroundWorkerForSending =  true;
+            chatClient.UseBackgroundWorkerForSending = true;
 #endif
-            chatClient.AuthValues = new AuthenticationValues(this.UserName);
+            chatClient.AuthValues = new AuthenticationValues(UserName);
             chatClient.ConnectUsingSettings(chatAppSettings);
+        }
+
+        public void DisConnect()
+        {
+            chatClient?.Disconnect();
+            currentRoomName = null;
         }
 
         public void SendChatMessage(string inputLine)
