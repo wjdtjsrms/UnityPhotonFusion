@@ -20,7 +20,7 @@ namespace JSGCode.Internship.UI
 
             sendMessageBtn.onClick.AddListener(() =>
             {
-                ChatProvider.Instance.OnEnterSend(inputField.text);
+                ChatProvider.Instance.SendChatMessage(inputField.text);
                 inputField.text = "";
             });
         }

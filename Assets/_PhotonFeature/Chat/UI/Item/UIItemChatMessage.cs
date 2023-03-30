@@ -17,7 +17,7 @@ namespace JSGCode.Internship.UI
         {
             base.SetItem(data);
             message.text = $"{data.sender}: {data.meesage}";
-            message.color = data.sender == ChatProvider.Instance.userName ? Color.black : Color.white;
+            message.color = data.sender == ChatProvider.Instance.UserName ? Color.black : Color.white;
         }
         #endregion
     }
