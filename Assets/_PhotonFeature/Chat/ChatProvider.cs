@@ -264,18 +264,18 @@ namespace JSGCode.Internship.Chat
 
         public void OnGetMessages(string channelName, string[] senders, object[] messages)
         {
-            if (channelName.Equals(this.selectedChannelName))
-            {
-                // update text
-                this.ShowChannel(this.selectedChannelName);
-            }
+            if (channelName.Equals(selectedChannelName))
+                ShowChannel(selectedChannelName);
         }
 
         public void OnPrivateMessage(string sender, object message, string channelName)
         {
             // as the ChatClient is buffering the messages for you, this GUI doesn't need to do anything here
             // you also get messages that you sent yourself. in that case, the channelName is determinded by the target of your msg
-            this.InstantiateChannelButton(channelName);
+            if (userName.Equals(sender) == false)
+            {
+                onUserSubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(sender));
+            }
 
             byte[] msgBytes = message as byte[];
             if (msgBytes != null)
@@ -355,15 +355,13 @@ namespace JSGCode.Internship.Chat
         public void OnUserSubscribed(string channel, string user)
         {
             Debug.LogFormat("OnUserSubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
-            onUserSubscribed?.Invoke(user);
-
-            this.chatClient.SendPrivateMessage(user, this.testBytes, true);
-            //chatClient.SendPrivateMessage(user, "2 x 3 x 7");
+            onUserSubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(user));
+            chatClient.SendPrivateMessage(user, "Hello", true);
         }
 
         public void OnUserUnsubscribed(string channel, string user)
         {
-            onUserUnsubscribed?.Invoke(user);
+            onUserUnsubscribed?.Invoke(chatClient.GetPrivateChannelNameByUser(user));
             Debug.LogFormat("OnUserUnsubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
         }
         #endregion
