@@ -18,7 +18,7 @@ namespace JSGCode.Internship.Chat
 
         public int HistoryLengthToFetch; // set in inspector. Up to a certain degree, previously sent messages can be fetched for context
 
-        private string userName { get; set; }
+        public string userName { get; private set; }
 
         private string selectedChannelName; // mainly used for GUI/input
 

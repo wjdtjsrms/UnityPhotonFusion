@@ -1,5 +1,6 @@
 namespace JSGCode.Internship.UI
 {
+    using JSGCode.Internship.Chat;
     using JSGCode.Internship.DataModel;
     using JSGCode.UI;
     using TMPro;
@@ -16,6 +17,7 @@ namespace JSGCode.Internship.UI
         {
             base.SetItem(data);
             message.text = $"{data.sender}: {data.meesage}";
+            message.color = data.sender == ChatProvider.Instance.userName ? Color.black : Color.white;
         }
         #endregion
     }

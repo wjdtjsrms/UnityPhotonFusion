@@ -16,7 +16,8 @@ namespace JSGCode.Internship.UI
         public override void Release()
         {
             base.Release();
-            ChatProvider.Instance.onChangeChannelText -= SetChanelText;
+            if (ChatProvider.Instance != null)
+                ChatProvider.Instance.onChangeChannelText -= SetChanelText;
         }
         #endregion
 
@@ -27,10 +28,8 @@ namespace JSGCode.Internship.UI
 
             foreach (var message in messages)
             {
-                var sender = message.Split(":")[0];
-                var content = message.Split(":")[1];
-
-                AddItem(new ChatMessageModel(sender, content));
+                var messageSplit = message.Split(":");
+                AddItem(new ChatMessageModel(messageSplit[0], messageSplit[1]));
             }
         }
         #endregion
