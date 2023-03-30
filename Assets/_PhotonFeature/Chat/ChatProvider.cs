@@ -286,6 +286,8 @@ namespace JSGCode.Internship.Chat
             {
                 Debug.Log("Message with byte[].Length: " + msgBytes.Length);
             }
+
+            Debug.LogWarning(channelName);
             if (this.selectedChannelName.Equals(channelName))
             {
                 this.ShowChannel(channelName);
@@ -358,7 +360,9 @@ namespace JSGCode.Internship.Chat
         {
             Debug.LogFormat("OnUserSubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
             onUserSubscribed?.Invoke(user);
-            chatClient.SendPrivateMessage(user, "2 x 3 x 7");
+
+            this.chatClient.SendPrivateMessage(user, this.testBytes, true);
+            //chatClient.SendPrivateMessage(user, "2 x 3 x 7");
         }
 
         public void OnUserUnsubscribed(string channel, string user)
