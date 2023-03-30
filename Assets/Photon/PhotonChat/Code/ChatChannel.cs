@@ -126,6 +126,16 @@ namespace Photon.Chat
             return txt.ToString();
         }
 
+        public List<string> ToStringListMessage()
+        {
+            List<string> messages = new(); 
+            for (int i = 0; i < this.Messages.Count; i++)
+            {
+                messages.Add(string.Format("{0}: {1}", this.Senders[i], this.Messages[i]));
+            }
+            return messages;
+        }
+
         internal void ReadChannelProperties(Dictionary<object, object> newProperties)
         {
             if (newProperties != null && newProperties.Count > 0)

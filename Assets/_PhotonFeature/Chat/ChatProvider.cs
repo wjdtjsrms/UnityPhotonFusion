@@ -18,18 +18,32 @@ namespace JSGCode.Internship.Chat
 
         public int HistoryLengthToFetch; // set in inspector. Up to a certain degree, previously sent messages can be fetched for context
 
-        public string UserName { get; set; }
+        private string userName { get; set; }
 
         private string selectedChannelName; // mainly used for GUI/input
 
         private ChatClient chatClient;
 
-        private ChatAppSettings chatAppSettings = new ChatAppSettings();
+        private ChatAppSettings chatAppSettings;
 
         public TMP_InputField InputFieldChat;   // set in inspector
-        public Text CurrentChannelText;     // set in inspector
+
+        public List<string> currentChannelText = new();
+        public List<string> CurrentChannelText 
+        {
+            get
+            {
+                return currentChannelText;
+            }
+            set
+            {
+                currentChannelText = value;
+                onChangeChannelText?.Invoke(currentChannelText);
+            }
+        }
         public Toggle ChannelToggleToInstantiate; // set in inspector
 
+        public Action<List<string>> onChangeChannelText;
 
         public GameObject FriendListUiItemtoInstantiate;
 
@@ -45,15 +59,14 @@ namespace JSGCode.Internship.Chat
         #endregion
 
         #region Method : Mono
-        public void Start()
+        public void Awake()
         {
             chatState = ChatState.Uninitialized;
+
+            chatAppSettings ??= new ChatAppSettings();
             chatAppSettings.AppIdChat = "870598ae-744a-4d8d-8728-5b8471e1f9f8";
 
-            if (string.IsNullOrEmpty(UserName))
-            {
-                UserName = "user" + Environment.TickCount % 99; //made-up username
-            }
+            Connect();
         }
 
         public void OnDestroy()
@@ -78,14 +91,19 @@ namespace JSGCode.Internship.Chat
         #endregion
 
         #region Method
-        public void Connect()
+        public void Connect(string userName = null)
         {
+            if (string.IsNullOrEmpty(userName))
+                userName = "user" + Environment.TickCount % 99; //made-up username
+
+            this.userName = userName;
+
             chatClient ??= new ChatClient(this);
 #if !UNITY_WEBGL
             chatClient.UseBackgroundWorkerForSending = true;
 #endif
-            chatClient.AuthValues = new AuthenticationValues(UserName);
-            chatClient.ConnectUsingSettings(this.chatAppSettings);
+            chatClient.AuthValues = new AuthenticationValues(this.userName);
+            chatClient.ConnectUsingSettings(chatAppSettings);
         }
 
         public void OnEnterSend(string message)
@@ -130,11 +148,6 @@ namespace JSGCode.Internship.Chat
             {
                 chatClient.PublishMessage(selectedChannelName, inputLine);
             }
-        }
-
-        public void PostHelpToCurrentChannel()
-        {
-            this.CurrentChannelText.text += "";
         }
 
         private void InstantiateChannelButton(string channelName)
@@ -182,7 +195,7 @@ namespace JSGCode.Internship.Chat
             }
 
             this.selectedChannelName = channelName;
-            this.CurrentChannelText.text = channel.ToStringMessages();
+            CurrentChannelText = channel.ToStringListMessage();
             Debug.Log("ShowChannel: " + this.selectedChannelName);
 
             foreach (KeyValuePair<string, Toggle> pair in this.channelToggles)
@@ -230,7 +243,7 @@ namespace JSGCode.Internship.Chat
                 // add to the UI as well
                 foreach (string _friend in this.FriendsList)
                 {
-                    if (this.FriendListUiItemtoInstantiate != null && _friend != this.UserName)
+                    if (this.FriendListUiItemtoInstantiate != null && _friend != this.userName)
                     {
                         this.InstantiateFriendButton(_friend);
                     }

@@ -15,7 +15,7 @@ public class UIPageTest : MonoBehaviour
     #region Method : Mono
     private void Awake()
     {
-       startChatBtn.onClick.AddListener(ChatProvider.Instance.Connect);
+        startChatBtn.onClick.AddListener(() => ChatProvider.Instance.Connect());
     }
     #endregion
 }
