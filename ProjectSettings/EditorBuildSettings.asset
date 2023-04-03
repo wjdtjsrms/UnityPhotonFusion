@@ -6,6 +6,27 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Main.unity
+    guid: 845231bc19ffc8a4c870f7923cf805ba
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Scene_1.unity
+    guid: 58acb950a4621094285606f12c155241
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Scene_2.unity
+    guid: 3ed8ae7a69aed044a8017fd7f01be6e0
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Scene_3.unity
+    guid: c2ae93296da3b6047be31ecf739ce4c9
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Scene_4.unity
+    guid: 1ad7a1e1439756f4b9ee0d43c58fcd0e
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Launcher_ScenesButton.unity
+    guid: 79005d45d9934a84995fdf162dc40436
+  - enabled: 1
+    path: Assets/Example/SceneLoading/Scenes/Launcher_CharacterMove.unity
+    guid: 2b98fe1883130b34392153751394c15c
+  - enabled: 1
     path: Assets/Example/MatchMacking/Scenes/0.Launch.unity
     guid: 08b33c2596e47409d81fef3514d248c3
   - enabled: 1
