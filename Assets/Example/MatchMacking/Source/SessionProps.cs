@@ -16,11 +16,15 @@ public class SessionProps
 	public MapIndex StartMap;
 	public bool AllowLateJoin;
 
-	/// <summary>
-	/// Support code that allow conversion of the above fields to and from the SessionProperty dictionary needed by Fusion
-	/// </summary>
+	public string RoomDescription;
+    public string RoomType;
+	public string UserID;
 
-	public SessionProps()
+    /// <summary>
+    /// Support code that allow conversion of the above fields to and from the SessionProperty dictionary needed by Fusion
+    /// </summary>
+
+    public SessionProps()
 	{
 	}
 
